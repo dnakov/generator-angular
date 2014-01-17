@@ -55,15 +55,15 @@ var Generator = module.exports = function Generator(args, options) {
     args.push('--minsafe');
   }
 
-  this.hookFor('angular:common', {
+  this.hookFor('vfangular:common', {
     args: args
   });
 
-  this.hookFor('angular:main', {
+  this.hookFor('vfangular:main', {
     args: args
   });
 
-  this.hookFor('angular:controller', {
+  this.hookFor('vfangular:controller', {
     args: args
   });
 
@@ -128,6 +128,26 @@ Generator.prototype.welcome = function welcome() {
     }
   }
 };
+Generator.prototype.askForStaticResource = function askForStaticResource() {
+  var cb = this.async();
+
+  this.prompt([{
+    type: 'input',
+    name: 'staticResource',
+    message: 'Enter a name for your static resource.',
+    default: this.scriptAppName
+  }], function (props) {
+    this.staticResource = props.staticResource;
+
+    this.staticResourceFullPathDev =  path.join(this.appPath, '../../resource-bundles/' + this.staticResource + 'DEV.resource/');
+    this.vfPageFullPath =  path.join(this.appPath, '../../src/pages/' + this.staticResource + '.page');
+    this.staticResourceZipPathDev = path.join(this.appPath, '../../src/staticresources/' + this.staticResource + 'DEV.resource');
+    // console.log(this.staticResourceFullPathDev);
+
+    // this.env.options.staticResourceFullPathDev = this.staticResourceFullPathDev;
+    cb();
+  }.bind(this));
+};
 
 Generator.prototype.askForCompass = function askForCompass() {
   var cb = this.async();
@@ -179,15 +199,15 @@ Generator.prototype.askForModules = function askForModules() {
     choices: [{
       value: 'resourceModule',
       name: 'angular-resource.js',
-      checked: true
+      checked: false
     }, {
       value: 'cookiesModule',
       name: 'angular-cookies.js',
-      checked: true
+      checked: false
     }, {
       value: 'sanitizeModule',
       name: 'angular-sanitize.js',
-      checked: true
+      checked: false
     }, {
       value: 'routeModule',
       name: 'angular-route.js',
@@ -229,7 +249,8 @@ Generator.prototype.askForModules = function askForModules() {
 
 Generator.prototype.readIndex = function readIndex() {
   this.ngRoute = this.env.options.ngRoute;
-  this.indexFile = this.engine(this.read('../../templates/common/index.html'), this);
+  this.indexFile = this.engine(this.read('../../templates/common/index-pre.html'), this);
+  console.log(this.indexFile);
 };
 
 Generator.prototype.bootstrapFiles = function bootstrapFiles() {
@@ -246,20 +267,30 @@ Generator.prototype.bootstrapFiles = function bootstrapFiles() {
   this.copy('styles/' + mainFile, 'app/styles/' + mainFile);
 };
 
-Generator.prototype.appJs = function appJs() {
-  this.indexFile = this.appendFiles({
-    html: this.indexFile,
-    fileType: 'js',
-    optimizedPath: 'scripts/scripts.js',
-    sourceFileList: ['scripts/app.js', 'scripts/controllers/main.js'],
-    searchPath: ['.tmp', 'app']
-  });
-};
+// Generator.prototype.appJs = function appJs() {
+//   this.indexFile = this.appendFiles({
+//     html: this.indexFile,
+//     fileType: 'js',
+//     optimizedPath: 'scripts/scripts.js',
+//     sourceFileList: ['scripts/app.js', 'scripts/controllers/main.js'],
+//     searchPath: ['.tmp', 'app']
+//   });
+//   console.log(this.indexFile);
+// };
 
 Generator.prototype.createIndexHtml = function createIndexHtml() {
   this.indexFile = this.indexFile.replace(/&apos;/g, "'");
+  this.write(path.join(this.appPath, 'index-pre.html'), this.indexFile);
   this.write(path.join(this.appPath, 'index.html'), this.indexFile);
 };
+
+Generator.prototype.createMetaFiles = function createMetaFiles() {
+  var staticResourceMeta = '<?xml version="1.0" encoding="UTF-8"?><StaticResource xmlns="http://soap.sforce.com/2006/04/metadata"><cacheControl>Private</cacheControl><contentType>application/x-zip-compressed</contentType></StaticResource>';
+  var vfPageMeta = '<?xml version="1.0" encoding="UTF-8"?><ApexPage xmlns="http://soap.sforce.com/2006/04/metadata"><apiVersion>29.0</apiVersion><availableInTouch>true</availableInTouch><label>Generated with vfangular</label></ApexPage>';
+  this.writeFileFromString(vfPageMeta, this.vfPageFullPath + '-meta.xml');
+  this.writeFileFromString(staticResourceMeta, this.staticResourceZipPathDev + '-meta.xml');
+ 
+}
 
 Generator.prototype.packageFiles = function () {
   this.coffee = this.env.options.coffee;
@@ -287,8 +318,8 @@ Generator.prototype._injectDependencies = function _injectDependencies() {
       directory: 'app/bower_components',
       bowerJson: JSON.parse(fs.readFileSync('./bower.json')),
       ignorePath: 'app/',
-      htmlFile: 'app/index.html',
-      cssPattern: '<link rel="stylesheet" href="{{filePath}}">'
+      htmlFile: 'app/index-pre.html',
+      cssPattern: '<link rel="stylesheet" href="{{filePath}}"/>'
     });
   }
 };

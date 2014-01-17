@@ -73,6 +73,7 @@ module.exports = function (grunt) {
     // The actual grunt server settings
     connect: {
       options: {
+        protocol:'https',
         port: 9000,
         // Change this to '0.0.0.0' to access the server from outside.
         hostname: 'localhost',
@@ -134,6 +135,17 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      dev: {
+        options: {force:true},
+        files: [{
+          dot: true,
+            src: [
+              '.tmp',
+              '<%= staticResourceFullPathDev %>/**'
+            ]
+        }
+        ]
+      },
       server: '.tmp'
     },
 
@@ -155,7 +167,7 @@ module.exports = function (grunt) {
     // Automatically inject Bower components into the app
     'bower-install': {
       app: {
-        html: '<%%= yeoman.app %>/index.html',
+        html: '<%%= yeoman.app %>/index-pre.html',
         ignorePath: '<%%= yeoman.app %>/'
       }
     },
@@ -235,7 +247,7 @@ module.exports = function (grunt) {
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
     useminPrepare: {
-      html: '<%%= yeoman.app %>/index.html',
+      html: '<%%= yeoman.app %>/index-pre.html',
       options: {
         dest: '<%%= yeoman.dist %>'
       }
@@ -308,8 +320,91 @@ module.exports = function (grunt) {
       }
     },
 
+    targethtml: {
+      vf: {
+        files: {
+          '<%= vfPageFullPath %>': '<%= vfPageFullPath %>'
+        }
+      },
+      novf: {
+        files: {
+          '<%%= yeoman.app %>/index.html': '<%%= yeoman.app %>/index-pre.html'
+        }        
+      }
+    },
+    dom_munger: {
+        scripts: {
+          options: {
+            //You typically would only specify one option per target but they may be combined
+            // read: {selector:'link',attribute:'href',writeto:'myCssRefs',isPath:true},
+            // remove: '#removeMe',
+            // update: {selector:'html',attribute:'appmode', value:'production'},
+            prefix: {selector:'script',attribute:'src',value:'https://127.0.0.1:9000/'},
+            xml:true
+            // prefix: {selector:'link',attribute:'href',value:'http://127.0.0.1:9000/'},
+            // suffix: {selector:'script',attribute:'src',value:'}'},
+            // append: {selector:'body',html:'<div id="appended">Im being appended</div>'},
+            // prepend: {selector:'body',html:'<span>Im being prepended</span>'},
+            // text: {selector:'title',text:'My App'},
+            // callback: function($){
+            //   $('#sample2').text('Ive been updated via callback');
+            // }
+          },
+          src: ['<%= vfPageFullPath %>']
+        },
+        css: {
+          options: {
+            prefix: {selector:'link',attribute:'href',value:'https://127.0.0.1:9000/'},
+            xml:true
+          },
+          src: ['<%= vfPageFullPath %>']
+        }
+      },   
+      html2xml: {
+        src: ['<%= vfPageFullPath %>']
+      },
+    inline_angular_templates: {
+        vf: {
+            options: {
+                base: '<%%= yeoman.app %>', // (Optional) ID of the <script> tag will be relative to this folder. Default is project dir.
+                prefix: '/',            // (Optional) Prefix path to the ID. Default is empty string.
+                selector: 'body',       // (Optional) CSS selector of the element to use to insert the templates. Default is `body`.
+                method: 'prepend'       // (Optional) DOM insert method. Default is `prepend`.
+            },
+            files: {
+                '<%= vfPageFullPath %>': ['<%%= yeoman.app %>/views/*.html']
+            }
+        }
+    },     
+    ngtemplates:  {
+      dev:        {
+        src:      '<%%= yeoman.app %>/views/**.html',
+        dest:     '<%%= yeoman.app %>/.tmp/template.js',
+        options:  {
+          module: '<%= appname %>'
+        }
+      }
+    },      
     // Copies remaining files to places other tasks can use
     copy: {
+      dev: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%%= yeoman.app %>',
+          dest: '<%= staticResourceFullPathDev %>',
+          src: [
+            '**/*'
+          ]          
+        }]
+      },
+      vfPage: {
+        files: [{
+          // cwd: '<%%= yeoman.app %>',
+          dest: '<%= vfPageFullPath %>',
+          src: '<%%= yeoman.app %>/index-pre.html'
+        }]
+      },
       dist: {
         files: [{
           expand: true,
@@ -361,7 +456,7 @@ module.exports = function (grunt) {
       ]
     },
 
-    // By default, your `index.html`'s <!-- Usemin block --> will take care of
+    // By default, your `index-pre.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
     // cssmin: {
@@ -396,6 +491,24 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.registerTask('vf', function(target) {
+    if(target === 'dev')
+    {
+      return grunt.task.run([
+        'clean:dev',
+        'copy:dev',
+        'copy:vfPage',
+        'targethtml:vf',
+        'targethtml:novf',        
+        'dom_munger:scripts',
+        'dom_munger:css',
+        // 'inline_angular_templates:vf',
+        'ngtemplates:dev',
+        'html2xml',
+        'serve'
+      ]);
+    }
+  });
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
@@ -412,9 +525,9 @@ module.exports = function (grunt) {
     ]);
   });
 
-  grunt.registerTask('server', function (target) {
+  grunt.registerTask('server', function () {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-    grunt.task.run(['serve:' + target]);
+    grunt.task.run(['serve']);
   });
 
   grunt.registerTask('test', [
@@ -432,6 +545,24 @@ module.exports = function (grunt) {
     'concurrent:dist',
     'autoprefixer',
     'concat',
+    'ngmin',
+    'copy:dist',
+    'cdnify',
+    'cssmin',
+    'uglify',
+    'rev',
+    'usemin',
+    'htmlmin'
+  ]);
+
+  grunt.registerTask('dev', [
+    'clean:dist',
+    'bower-install',
+    'useminPrepare',
+    'concurrent:dist',
+    'autoprefixer',
+    'concat',
+    'targethtml:vf',
     'ngmin',
     'copy:dist',
     'cdnify',

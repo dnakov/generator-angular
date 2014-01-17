@@ -1,19 +1,15 @@
 {
-  "name": "generator-angular",
-  "version": "0.7.1",
-  "description": "Yeoman generator for AngularJS",
+  "name": "generator-vfangular",
+  "version": "0.1.0",
+  "description": "Angular Generator",
   "keywords": [
-    "yeoman-generator",
-    "scaffold",
-    "framework",
-    "component",
-    "front-end",
-    "app",
-    "angular"
   ],
-  "author": "Chrome Developer Relations",
+  "author": "dnakov",
   "main": "app/index.js",
-  "repository": "yeoman/generator-angular",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnakov/generator-vfangular.git"
+  },
   "scripts": {
     "test": "mocha"
   },
