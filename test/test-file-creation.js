@@ -25,7 +25,7 @@ describe('Angular generator', function () {
       if (err) {
         done(err);
       }
-      angular = helpers.createGenerator('angular:app', deps);
+      angular = helpers.createGenerator('vfangular:app', deps);
       angular.options['skip-install'] = true;
       done();
     });
@@ -132,7 +132,7 @@ describe('Angular generator', function () {
     var angularGenerator;
     var name = 'foo';
     var deps = [path.join('../..', generatorType)];
-    angularGenerator = helpers.createGenerator('angular:' + generatorType, deps, [name]);
+    angularGenerator = helpers.createGenerator('vfangular:' + generatorType, deps, [name]);
 
     helpers.mockPrompt(angular, {
       compass: true,
@@ -199,7 +199,7 @@ describe('Angular generator', function () {
     it('should generate a new view', function (done) {
       var angularView;
       var deps = ['../../view'];
-      angularView = helpers.createGenerator('angular:view', deps, ['foo']);
+      angularView = helpers.createGenerator('vfangular:view', deps, ['foo']);
 
       helpers.mockPrompt(angular, {
         compass: true,
@@ -220,7 +220,7 @@ describe('Angular generator', function () {
     it('should generate a new view in subdirectories', function (done) {
       var angularView;
       var deps = ['../../view'];
-      angularView = helpers.createGenerator('angular:view', deps, ['foo/bar']);
+      angularView = helpers.createGenerator('vfangular:view', deps, ['foo/bar']);
 
       helpers.mockPrompt(angular, {
         compass: true,
