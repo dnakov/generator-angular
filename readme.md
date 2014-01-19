@@ -1,44 +1,71 @@
 # AngularJS generator [![Build Status](https://secure.travis-ci.org/yeoman/generator-angular.png?branch=master)](http://travis-ci.org/yeoman/generator-angular) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
-> Yeoman generator for AngularJS - lets you quickly set up a project with sensible defaults and best practises.
+> Yeoman generator for Visualforce+AngularJS - lets you quickly set up a project with sensible defaults and best practises.
 
 
 ## Usage
 
-Install `generator-angular`:
+Install `generator-vfangular`:
 ```
-npm install -g generator-angular
-```
-
-Make a new directory, and `cd` into it:
-```
-mkdir my-new-project && cd $_
+npm install -g git://github.com/dnakov/generator-vfangular.git
 ```
 
-Run `yo angular`, optionally passing an app name:
+Create a new MavensMate project, then make a new directory in the root and get in there.
 ```
-yo angular [app-name]
+mkdir my-new-app && cd $_
 ```
 
-Run `grunt` for building and `grunt serve` for preview
+Run `yo vfangular`, optionally passing an app name:
+```
+yo vfangular [app-name]
+```
 
+## Editing files
+
+Basically edit your angular app as you normally would. The only difference is that instead of dealing with the index.html, you'll be dealing with `app/page.html` and `app/component.html`. All of the angular app stuff should go in `app/component.html`. Of course, utilize `app/views/*.html` and create partials and stuff.
+
+## Builds
+
+Run `grunt vf:local`:
+* Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
+* Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
+* Go to MavensMate and just Save the VF page and component. 
+* Start editing your angular files in `app/` and then refresh the VF page in Salesforce. You should see your changes.
+
+Run `grunt vf:dev`:
+* Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
+* Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
+* Copies the dist/ folder in the MavensMate folder `resource-bundles/<appname>DEV.resource/`
+* Go to MavensMate and Save the VF page and component. 
+* Press Ctrl+Shift+P, type `deploy resource bundle`, select `<appname>DEV.resource`, and hit enter. 
+
+Run `grunt vf:prod`:
+* Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
+* Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
+* Concatenates, minifies everything and does a bunch of other awesome stuff
+* Copies the app/ folder into the dist/ folder then into the MavensMate folder `resource-bundles/<appname>PROD.resource/`
+* Go to MavensMate and Save the VF page and component. 
+* Press Ctrl+Shift+P, type `deploy resource bundle`, select `<appname>PROD.resource`, and hit enter. 
+
+---------
+The rest of the information below is basically just the generator-angular documentation.
 
 ## Generators
 
 Available generators:
 
-* [angular](#app) (aka [angular:app](#app))
-* [angular:controller](#controller)
-* [angular:directive](#directive)
-* [angular:filter](#filter)
-* [angular:route](#route)
-* [angular:service](#service)
-* [angular:provider](#service)
-* [angular:factory](#service)
-* [angular:value](#service)
-* [angular:constant](#service)
-* [angular:decorator] (#decorator)
-* [angular:view](#view)
+* [vfangular](#app) (aka [vfangular:app](#app))
+* [vfangular:controller](#controller)
+* [vfangular:directive](#directive)
+* [vfangular:filter](#filter)
+* [vfangular:route](#route)
+* [vfangular:service](#service)
+* [vfangular:provider](#service)
+* [vfangular:factory](#service)
+* [vfangular:value](#service)
+* [vfangular:constant](#service)
+* [vfangular:decorator] (#decorator)
+* [vfangular:view](#view)
 
 **Note: Generators are to be run from the root directory of your app.**
 
@@ -47,7 +74,7 @@ Sets up a new AngularJS app, generating all the boilerplate you need to get star
 
 Example:
 ```bash
-yo angular
+yo vfangular
 ```
 
 ### Route
@@ -55,7 +82,7 @@ Generates a controller and view, and configures a route in `app/scripts/app.js` 
 
 Example:
 ```bash
-yo angular:route myroute
+yo vfangular:route myroute
 ```
 
 Produces `app/scripts/controllers/myroute.js`:
@@ -75,7 +102,7 @@ Generates a controller in `app/scripts/controllers`.
 
 Example:
 ```bash
-yo angular:controller user
+yo vfangular:controller user
 ```
 
 Produces `app/scripts/controllers/user.js`:
@@ -89,7 +116,7 @@ Generates a directive in `app/scripts/directives`.
 
 Example:
 ```bash
-yo angular:directive myDirective
+yo vfangular:directive myDirective
 ```
 
 Produces `app/scripts/directives/myDirective.js`:
@@ -110,7 +137,7 @@ Generates a filter in `app/scripts/filters`.
 
 Example:
 ```bash
-yo angular:filter myFilter
+yo vfangular:filter myFilter
 ```
 
 Produces `app/scripts/filters/myFilter.js`:
@@ -127,7 +154,7 @@ Generates an HTML view file in `app/views`.
 
 Example:
 ```bash
-yo angular:view user
+yo vfangular:view user
 ```
 
 Produces `app/views/user.html`:
@@ -140,7 +167,7 @@ Generates an AngularJS service.
 
 Example:
 ```bash
-yo angular:service myService
+yo vfangular:service myService
 ```
 
 Produces `app/scripts/services/myService.js`:
@@ -150,14 +177,14 @@ angular.module('myMod').service('myService', function () {
 });
 ```
 
-You can also do `yo angular:factory`, `yo angular:provider`, `yo angular:value`, and `yo angular:constant` for other types of services.
+You can also do `yo vfangular:factory`, `yo vfangular:provider`, `yo vfangular:value`, and `yo vfangular:constant` for other types of services.
 
 ### Decorator
 Generates an AngularJS service decorator.
 
 Example:
 ```bash
-yo angular:decorator serviceName
+yo vfangular:decorator serviceName
 ```
 
 Produces `app/scripts/decorators/serviceNameDecorator.js`:
@@ -178,7 +205,7 @@ For generators that output scripts, the `--coffee` option will output CoffeeScri
 
 For example:
 ```bash
-yo angular:controller user --coffee
+yo vfangular:controller user --coffee
 ```
 
 Produces `app/scripts/controller/user.coffee`:
