@@ -1,6 +1,13 @@
 'use strict';
 
-angular.module('<%= scriptAppName %>', [<%= angularModules %>])<% if (ngRoute) { %>
+var ngModules = [<%= angularModules %>];
+try { 
+  angular.module('<%= scriptAppName %>.templates'); 
+  ngModules.push('<%= scriptAppName %>.templates');
+} catch(err) {}
+
+angular.module('<%= scriptAppName %>', ngModules)
+<% if (ngRoute) { %>
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
@@ -10,4 +17,6 @@ angular.module('<%= scriptAppName %>', [<%= angularModules %>])<% if (ngRoute) {
       .otherwise({
         redirectTo: '/'
       });
-  })<% } %>;
+  })<% } %>
+  .run(function($rootScope) {
+  });

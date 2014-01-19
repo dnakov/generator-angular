@@ -1,8 +1,8 @@
 
-<!--(if target vf)><!-->
-  <apex:page doctype="html-5.0" applyHtmlTag="false" applyBodyTag="false">
+<!--(if target (vf || vflocal))><!-->
+  <apex:page <% if (standardController) { %> standardController="<%= standardController %>" <% } %> doctype="html-5.0" applyBodyTag="false">
 <!--<!(endif)-->
-<!--(if target !vf)><!-->
+<!--(if target novf)><!-->
 <!doctype html>
 <!--<!(endif)-->
 
@@ -16,6 +16,7 @@
     <title></title>
     <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width"/>
+    <!--(if target novf)><!-->
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
@@ -23,40 +24,30 @@
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css"/>
-    <!-- endbuild -->
+    <!-- endbuild -->   
+    <!--<!(endif)-->     
   </head>
-  <body ng-app="<%= scriptAppName %>">
+  <body>
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <!-- Add your site or application content here -->
-    <% if (ngRoute) {
-      %><div class="container" ng-view></div><%
-    } else {
-      %><div class="container" ng-include="'views/main.html'" ng-controller="MainCtrl"></div><%
-    } %>
+    <!--(if target (vf || vflocal))><!-->
+    <c:<%= appname %>/>
 
-    <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.min.js"></script>
-    <![endif]-->
-
-    <!-- build:js scripts/vendor.js -->
-    <!-- bower:js -->
-    <!-- endbower -->
-    <!-- endbuild -->
-
-    <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/app.js"></script>
-    <script src="scripts/controllers/main.js"></script>
-    <!-- endbuild -->  
-    
-    <!--(if target vf)><!-->
-    <script src=".tmp/template.js"></script>
+    <% if (standardController) { 
+      %><script>
+        var sf = {};
+        sf.standardController = {};
+        sf.standardController.sObjectId = '{!<%=standardController%>}';
+      </script>
+    <% } %>
+    <!--<!(endif)-->
+    <!--(if target novf)><!-->
+    <link rel="import" href="component.html"/>
     <!--<!(endif)-->
   </body>
 </html>
-<!--(if target vf)><!-->
+<!--(if target (vf || vflocal))><!-->
   </apex:page>
 <!--<!(endif)-->
