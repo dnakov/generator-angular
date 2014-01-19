@@ -138,6 +138,17 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      prod: {
+        options: {force:true},
+        files: [{
+          dot: true, 
+          src: [
+            '.tmp',
+            '<%= staticResourceFullPathProd %>/*',
+            '!<%= staticResourceFullPathProd %>/.git*'
+          ]
+        }]
+      },      
       dev: {
         options: {force:true},
         files: [{
@@ -145,7 +156,8 @@ module.exports = function (grunt) {
             src: [
               '.tmp',
               '<%%= yeoman.app %>/.tmp',
-              '<%= staticResourceFullPathDev %>/**'
+              '<%= staticResourceFullPathDev %>/*',
+              '!<%= staticResourceFullPathDev %>/.git*'
             ]
         }
         ]
@@ -360,8 +372,8 @@ module.exports = function (grunt) {
             // read: {selector:'link',attribute:'href',writeto:'myCssRefs',isPath:true},
             // remove: '#removeMe',
             // update: {selector:'html',attribute:'appmode', value:'production'},
-            prefix: {selector:'script',attribute:'src',value:'<%%= dom_munger.prefix %>'},
-            suffix: {selector:'script',attribute:'src',value:'<%%= dom_munger.suffix %>'},
+            prefix: {selector:'script[src!=\'\']',attribute:'src',value:'<%%= dom_munger.prefix %>'},
+            suffix: {selector:'script[src!=\'\']',attribute:'src',value:'<%%= dom_munger.suffix %>'},
             xml:true
             // prefix: {selector:'link',attribute:'href',value:'http://127.0.0.1:9000/'},
             // suffix: {selector:'script',attribute:'src',value:'}'},
@@ -372,7 +384,7 @@ module.exports = function (grunt) {
             //   $('#sample2').text('Ive been updated via callback');
             // }
           },
-          src: grunt.config.get('dom_munger.src')
+          src: '<%%= dom_munger.src %>'
         },
         css: {
           options: {
@@ -380,7 +392,7 @@ module.exports = function (grunt) {
             suffix: {selector:'link',attribute:'href',value:'<%%= dom_munger.suffix %>'},
             xml:true
           },
-          src: grunt.config.get('dom_munger.src')
+          src: '<%%= dom_munger.src %>'
         },
         img: {
           options: {
@@ -388,7 +400,7 @@ module.exports = function (grunt) {
             suffix: {selector:'img',attribute:'src',value:'<%%= dom_munger.suffix %>'},
             xml:true
           },
-          src: grunt.config.get('dom_munger.src')
+          src: '<%%= dom_munger.src %>'
         },
         apex: {
           options: {
@@ -396,11 +408,11 @@ module.exports = function (grunt) {
             suffix: {selector:'apex\\:stylesheet',attribute:'value',value:'<%%= dom_munger.suffix %>'},
             xml:true
           },
-          src: grunt.config.get('dom_munger.src')        
+          src: '<%%= dom_munger.src %>'        
         }        
       },   
       html2xml: {
-        src: ['.tmp/**/*.html']
+        src: '<%%= dom_munger.src %>' 
       },
     inline_angular_templates: {
         vf: {
@@ -432,7 +444,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           dot: true,
-          cwd: '<%%= yeoman.app %>',
+          cwd: '<%%= yeoman.dist %>',
           dest: '<%= staticResourceFullPathDev %>',
           src: [
             '**'
@@ -446,10 +458,20 @@ module.exports = function (grunt) {
           cwd: '<%%= yeoman.dist %>',
           dest: '<%= staticResourceFullPathProd %>',
           src: [
-            '**'
+            '**',
+            '!**/bower_components/**'
           ]          
         }]
       },
+      scripts: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%%= yeoman.app %>',
+          dest: '<%%= yeoman.dist %>',
+          src: ['scripts/**/*']
+        }]
+      },        
       vfPage: {
         files: [{
           // cwd: '<%%= yeoman.app %>',
@@ -592,28 +614,49 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('editRefs', function(target) {
-    if(target === 'local') {
-      grunt.config.set('dom_munger.src', ['.tmp/**/*.html']);
-      grunt.config.set('dom_munger.prefix', 'https://127.0.0.1:9000/');
+  grunt.registerTask('editRefs', function(target, what) {
+    var tgt;
+    if(what == 'partials') {
+      switch(target) {
+        case 'local': 
+          tgt = ''; break;
+        case 'dev':
+          tgt = 'DEV'; break;
+        case 'prod':
+          tgt = 'PROD'; break;
+      }
       grunt.config.set('dom_munger.suffix', '');
-    } else if(target === 'dev') {
-      grunt.config.set('dom_munger.src', ['.tmp/*-vf.html']);
-      grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.<%= staticResourceNameDev %>, \"');
-      grunt.config.set('dom_munger.suffix', '\")}');
-    } else if(target === 'prod') {
-      grunt.config.set('dom_munger.src', ['.tmp/*-vf.html']);
-      grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.<%= staticResourceNameProd %>, \"');
-      grunt.config.set('dom_munger.suffix', '\")}');
+      grunt.config.set('dom_munger.src', '<%%= yeoman.dist %>/views/*.html');
+      grunt.config.set('dom_munger.prefix', '/resource/' + (new Date()).getTime() + '/<%= scriptAppName %>' + tgt + '/');
+      console.log(grunt.config.get('dom_munger.src'));
+
+    } else {   
+      if(target === 'local') {
+        tgt = ''
+        grunt.config.set('dom_munger.src', '.tmp/**/*.html');
+        grunt.config.set('dom_munger.prefix', 'https://127.0.0.1:9000/');
+        grunt.config.set('dom_munger.suffix', '');
+      } else if(target === 'dev') {
+        tgt = 'DEV';
+        grunt.config.set('dom_munger.src', '.tmp/*-vf.html');
+        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.vftestDEV, \'');
+        grunt.config.set('dom_munger.suffix', '\')}');
+      } else if(target === 'prod') {
+        tgt = 'PROD';
+        grunt.config.set('dom_munger.src', '.tmp/*-vf.html');
+        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.vftestPROD, \'');
+        grunt.config.set('dom_munger.suffix', '\')}');
+      }
     }
-    grunt.task.run(['dom_munger:scripts', 'dom_munger:css','dom_munger:img','dom_munger:apex']);
+
+    grunt.task.run(['dom_munger:scripts', 'dom_munger:css','dom_munger:img','dom_munger:apex', 'html2xml']);
   });
 
   grunt.registerTask('vf', function(target) {
     if(target === 'local')
     {
       return grunt.task.run([
-        'clean:dev',
+        // 'clean:dev',
         'copy:vfToTemp',
         'copy:partials',
         'targethtml:vflocal',
@@ -631,25 +674,28 @@ module.exports = function (grunt) {
     if(target === 'dev')
     {
       return grunt.task.run([
+        'clean:dist',
         'clean:dev',
-        'copy:vfToTemp',
-        'copy:partials',
+        'bower-install',
+        'concurrent:dist',
+        'autoprefixer',
+        'copy:dist',
+        'copy:scripts',
+        'copy:vfToTempDist',
         'targethtml:vf',
         'targethtml:novf',        
         'editRefs:dev',
-        // 'inline_angular_templates:vf',
-        // 'ngtemplates:dev',
-        'html2xml',
+        'editRefs:dev:partials',
         'copy:vfPage',
-        'copy:vfComponent',
-        'copy:dev',
-        'serve'
+        'copy:vfComponent', 
+        'copy:dev',       
       ]);
     }  
     if(target === 'prod')
     {
       return grunt.task.run([
         'clean:dist',
+        'clean:prod',
         'bower-install',
         'useminPrepare',
         'concurrent:dist',
@@ -665,6 +711,7 @@ module.exports = function (grunt) {
         'targethtml:vf',
         'targethtml:novf',        
         'editRefs:prod',
+        'editRefs:prod:partials',
         'html2xml',
         'copy:vfPage',
         'copy:vfComponent', 

@@ -35,13 +35,13 @@
     <!--(if target (vf || vflocal))><!-->
     <c:<%= appname %>/>
 
-    <% if (standardController) { 
-      %><script>
-        var sf = {};
+      <script>      
+        var sf = sf || {};<% if (standardController) { %>
         sf.standardController = {};
         sf.standardController.sObjectId = '{!<%=standardController%>}';
+        <% } %>
       </script>
-    <% } %>
+
     <!--<!(endif)-->
     <!--(if target novf)><!-->
     <link rel="import" href="component.html"/>
