@@ -26,6 +26,8 @@ Basically edit your angular app as you normally would. The only difference is th
 
 ## Builds
 
+NOTE: You will need to get the ngForceController APEX stuff from here https://github.com/noeticpenguin/ngForce/tree/master/Example and deploy to your org for now.
+
 Run `grunt vf:local`:
 * Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
 * Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
