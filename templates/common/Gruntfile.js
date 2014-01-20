@@ -376,8 +376,8 @@ module.exports = function (grunt) {
             // read: {selector:'link',attribute:'href',writeto:'myCssRefs',isPath:true},
             // remove: '#removeMe',
             // update: {selector:'html',attribute:'appmode', value:'production'},
-            prefix: {selector:'script[src!=\'\']',attribute:'src',value:'<%%= dom_munger.prefix %>'},
-            suffix: {selector:'script[src!=\'\']',attribute:'src',value:'<%%= dom_munger.suffix %>'},
+            prefix: {selector:'script[src!=\'\'][data-buildignore!=\'true\']',attribute:'src',value:'<%%= dom_munger.prefix %>'},
+            suffix: {selector:'script[src!=\'\'][data-buildignore!=\'true\']',attribute:'src',value:'<%%= dom_munger.suffix %>'},
             xml:true
             // prefix: {selector:'link',attribute:'href',value:'http://127.0.0.1:9000/'},
             // suffix: {selector:'script',attribute:'src',value:'}'},
@@ -392,16 +392,16 @@ module.exports = function (grunt) {
         },
         css: {
           options: {
-            prefix: {selector:'link',attribute:'href',value:'<%%= dom_munger.prefix %>'},
-            suffix: {selector:'link',attribute:'href',value:'<%%= dom_munger.suffix %>'},
+            prefix: {selector:'link[href!=\'\'][data-buildignore!=\'true\']',attribute:'href',value:'<%%= dom_munger.prefix %>'},
+            suffix: {selector:'link[href!=\'\'][data-buildignore!=\'true\']',attribute:'href',value:'<%%= dom_munger.suffix %>'},
             xml:true
           },
           src: '<%%= dom_munger.src %>'
         },
         img: {
           options: {
-            prefix: {selector:'img',attribute:'src',value:'<%%= dom_munger.prefix %>'},
-            suffix: {selector:'img',attribute:'src',value:'<%%= dom_munger.suffix %>'},
+            prefix: {selector:'img[src!=\'\'][data-buildignore!=\'true\']',attribute:'src',value:'<%%= dom_munger.prefix %>'},
+            suffix: {selector:'img[src!=\'\'][data-buildignore!=\'true\']',attribute:'src',value:'<%%= dom_munger.suffix %>'},
             xml:true
           },
           src: '<%%= dom_munger.src %>'
