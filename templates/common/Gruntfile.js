@@ -643,12 +643,12 @@ module.exports = function (grunt) {
       } else if(target === 'dev') {
         tgt = 'DEV';
         grunt.config.set('dom_munger.src', '.tmp/*-vf.html');
-        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.vftestDEV, \'');
+        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.<%= scriptAppName %>DEV, \'');
         grunt.config.set('dom_munger.suffix', '\')}');
       } else if(target === 'prod') {
         tgt = 'PROD';
         grunt.config.set('dom_munger.src', '.tmp/*-vf.html');
-        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.vftestPROD, \'');
+        grunt.config.set('dom_munger.prefix', '{!URLFOR($Resource.<%= scriptAppName %>PROD, \'');
         grunt.config.set('dom_munger.suffix', '\')}');
       }
     }
