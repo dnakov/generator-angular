@@ -31,14 +31,14 @@ NOTE: You will need to get the ngForceController APEX stuff from here https://gi
 Run `grunt vf:local`:
 * Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
 * Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
-* Go to MavensMate and just Save the VF page and component. 
+* Go to MavensMate and just Save the VF component and page. 
 * Start editing your angular files in `app/` and then refresh the VF page in Salesforce. You should see your changes.
 
 Run `grunt vf:dev`:
 * Creates your VF page in the MavensMate folder `src/pages/<appname>.page`
 * Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
 * Copies the dist/ folder in the MavensMate folder `resource-bundles/<appname>DEV.resource/`
-* Go to MavensMate and Save the VF page and component. 
+* Go to MavensMate and Save the VF component and page. 
 * Press Ctrl+Shift+P, type `deploy resource bundle`, select `<appname>DEV.resource`, and hit enter. 
 
 Run `grunt vf:prod`:
@@ -46,7 +46,7 @@ Run `grunt vf:prod`:
 * Creates your VF component in the MavensMate folder `src/pages/<appname>.component` (there's a good reason for it)
 * Concatenates, minifies everything and does a bunch of other awesome stuff
 * Copies the app/ folder into the dist/ folder then into the MavensMate folder `resource-bundles/<appname>PROD.resource/`
-* Go to MavensMate and Save the VF page and component. 
+* Go to MavensMate and Save the VF component and page. 
 * Press Ctrl+Shift+P, type `deploy resource bundle`, select `<appname>PROD.resource`, and hit enter. 
 
 ---------
